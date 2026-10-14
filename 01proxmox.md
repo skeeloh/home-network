@@ -14,4 +14,4 @@ I also encountered an issue where closing the laptop lid suspended Proxmox and m
 
 Verification:
 ---
-How you confirmed it works.
+Verifying this step was straight forward. At this point we are just checking for operability via remotely opening a shell, restarting the device, and seeing if it keeps functioning while the laptop lid is closed. All these boxes are checked after a few fixes so I am good to continue. 
