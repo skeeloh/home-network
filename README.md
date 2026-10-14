@@ -1,4 +1,3 @@
-home-network
 Goal: 
 This is my first time attempting to create an indepentdent "enterprise" esq home network. The goal is to take one of my two links from my ISP, turn my old school laptop into a server hosting my virtual firewall, then passing this to a managed switch with the intent of having multiple functioning devices on the other side. I have many devices, smart surge protectors, intelligent thermostats for my bioactive snake enclosures, etc. that probably should not be touching my private network with as much freedom as they have been. That is my main motivation. Long term I plan to add some cloud implementation and network attatched storage for fun, I dont necessarily have a need for this at the present moment, I just want to experience the set up first hand.
 
