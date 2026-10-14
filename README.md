@@ -8,7 +8,6 @@ Current Status:
 
 Planned Network Architecture
 ===
-Status: Planned — not yet deployed.
 
 ```mermaid
 flowchart TD
