@@ -1,5 +1,5 @@
 Purpose:
-===
+---
 I am installing Proxmox to avoid the expense of purchasing new hardware where applicable. The purpose of Proxmox in this case is to host multiple virtual machines on this single repurposed device. This software is cool because it utilizes KVM to provide each VM with its own OS. Utilizing it, I can run various tools without stressing about compatibility, I.E., OPNsense or AdGuard, which will be added and explained in later renditions. By each instance being "Hosted Separately", I can also manage each service as an individual and remedy them as such. 
 
 Steps taken:
