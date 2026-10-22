@@ -1,27 +1,20 @@
 Purpose:
----
-I am installing OPNsense to serve as the router and firewall for my lab network. Running it as a virtual machine in Proxmox lets me reuse the Framework laptop instead of purchasing a dedicated firewall appliance. This gives me a place to practice routing, DHCP, firewall rules, and eventually VLAN segmentation. The Cox router continues serving the household network, while OPNsense will control traffic for the devices connected behind it.
-
+I am configuring OPNsense to manage traffic between my home network and the devices connected behind my virtual firewall. Hosting it in Proxmox allows me to use the laptop I already repurposed instead of purchasing a separate firewall. For now, my everyday PC is connected directly to the second Ethernet adapter. The goal at this stage is to get normal internet access working through OPNsense before adding services such as AdGuard Home and separate networks for testing.
 Steps taken:
----
-I downloaded the AMD64 OPNsense ISO and uploaded it to Proxmox’s local storage. I created a VM with 2 CPU cores, 4GB of RAM, and a 32GB virtual disk.
+With OPNsense installed and its web interface accessible, I completed the setup wizard. This included setting the hostname, domain, time zone, DNS settings, and administrator password. I kept the WAN connection on DHCP so it receives an address from my existing router. On the LAN side, I kept a separate subnet and enabled DHCP so OPNsense can automatically assign addresses to connected devices. I also enabled the Unbound DNS resolver to handle DNS requests.
 
-I configured two virtual network interfaces. The WAN interface connects to `vmbr0`, which reaches the Cox router through the first USB Ethernet adapter. The LAN interface connects to `vmbr1`, a VLAN-aware bridge attached to the second adapter. This provides separate upstream and lab connections.
+Since OPNsense sits behind my existing home router, I unchecked the WAN setting that blocks private networks. Private addresses are expected on this connection. I then installed the available OPNsense updates and rebooted the firewall.
 
-After correcting the interface assignments, I installed OPNsense onto its virtual disk and configured a root password. I detached the installer ISO and booted from the installed system. I then reconnected WAN and connected my home PC directly to the second Ethernet adapter, allowing it to act as a physical test device without a switch.
+For the virtual machine configuration, I confirmed that hardware checksum offloading, TCP segmentation offloading, and large receive offloading were disabled. I also disabled VLAN hardware filtering and turned off IPv6 to keep this initial setup focused on IPv4. After applying these settings, I rebooted OPNsense again.
 
+I reviewed the firewall rules and kept the default IPv4 rule allowing devices on the LAN to initiate connections to other destinations. I considered blocking access to the household network, but my everyday PC still needs access to those resources and Proxmox management. I will add restrictions when I create separate networks for experimental VMs and guest devices.
 Problems and fixes:
----
-The second USB Ethernet adapter initially did not appear in Proxmox. I checked device detection using `lsusb` and `ip -br link`, then confirmed both adapters were recognized before assigning the second adapter to the LAN bridge.
+One concern was the amount of RAM allocated to OPNsense. Proxmox had shown high memory usage, which made me question whether 4 GB was enough. Checking inside OPNsense showed approximately 18% usage at that point, so I kept the existing allocation. This was a useful reminder to check memory usage inside the VM before assuming it needs more resources.
 
-OPNsense initially assigned LAN to `vtnet0` and WAN to `vtnet1`, which was opposite to the intended Proxmox bridge connections. I temporarily disconnected the VM’s upstream network interface to prevent its LAN DHCP service from reaching the household network. Through the OPNsense console, I reassigned WAN to `vtnet0` and LAN to `vtnet1`, then verified the mapping before reconnecting WAN.
+Another point to work through was how restrictive the firewall rules should be. Blocking the entire household subnet would also block access to devices I still want to use. I kept the current LAN trusted for now. Having a separate subnet gives me a place to build out the network, but it does not automatically isolate experimental devices from my PC or household resources.
 
-The console initially displayed no WAN address after reconnection. Running `ifconfig vtnet0` confirmed that the interface was active and had received an address from the Cox router.
-
+No additional connectivity issue showed up during this stage. OPNsense is currently behind my home router, so the setup uses double NAT. Normal browsing works, while automatic device discovery or services needing incoming connections may require additional configuration later.
 Verification:
----
-I confirmed that OPNsense boots with the installer ISO detached and retains the correct WAN and LAN assignments. WAN received an address on the household subnet, while LAN remained on its separate subnet.
+Verifying this step was straightforward. I confirmed that the OPNsense web interface was accessible after rebooting and that the WAN and LAN had the expected addressing. I then turned off Wi-Fi on my PC so the test would use the Ethernet connection through OPNsense. Websites loaded, and a speed test reached my expected full connection speed.
 
-After connecting my PC to the LAN adapter, I checked `ipconfig` and confirmed the expected address, subnet mask, and gateway. I also successfully signed in to the OPNsense web interface using the password created during installation.
-
-This verifies installation, interface mapping, LAN addressing, and management access. Completing the setup wizard, testing internet access with Wi-Fi disabled, and configuring and testing isolation rules are the next steps.
+Basic routing is working, and the current LAN rule supports the access I want for my everyday PC. A fresh configuration backup and automatic VM startup still need to be confirmed. The next step is installing AdGuard Home and testing DNS filtering before directing devices to use it.
